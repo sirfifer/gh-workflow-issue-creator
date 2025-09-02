@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Q&A
+    url: https://github.com/your-org/GH-Workflow-Issue-Creator/discussions
+    about: Ask how to use the action

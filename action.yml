@@ -1,0 +1,109 @@
+name: 'GH-Workflow-Issue-Creator'
+description: 'Create or update a detailed issue on workflow failure (smart dedupe, categories, AI-ready templates).'
+author: 'GH-Workflow-Issue-Creator maintainers'
+branding:
+  icon: 'alert-circle'
+  color: 'blue'
+
+inputs:
+  github-token:
+    description: 'Token used to call the GitHub API'
+    required: true
+  mode:
+    description: '"create" (default) or "close-on-success"'
+    required: false
+    default: 'create'
+  run-id:
+    description: 'Explicit run id (used when triggered from workflow_run)'
+    required: false
+  category:
+    description: 'Issue category (general, code-quality, security-scan, terraform-validation, infrastructure-deployment, etc.)'
+    required: false
+    default: 'general'
+  auto-detect-category:
+    description: 'If true, auto-detects category'
+    required: false
+    default: 'true'
+  dedupe-strategy:
+    description: 'Dedupe method: "fingerprint" (default) or "none"'
+    required: false
+    default: 'fingerprint'
+  failure-label:
+    description: 'Primary label for failure issues'
+    required: false
+    default: 'workflow-failure'
+  additional-labels:
+    description: 'Comma-separated list of extra labels to apply'
+    required: false
+  assignees:
+    description: 'Comma-separated list of assignees'
+    required: false
+  target-owner:
+    description: 'Alternate owner when creating issues cross-repo'
+    required: false
+  target-repo:
+    description: 'Alternate repo when creating issues cross-repo'
+    required: false
+  auth-mode:
+    description: 'github-token source: "default" (GITHUB_TOKEN) | "pat" (fine-grained PAT)'
+    required: false
+    default: 'default'
+  body-template:
+    description: 'Inline Mustache template for issue body (overrides template-path)'
+    required: false
+  body-template-path:
+    description: 'Path to a template file (relative to workspace)'
+    required: false
+  body-template-mode:
+    description: '"replace" (default) or "merge" with category template'
+    required: false
+    default: 'replace'
+  include-logs:
+    description: 'If true, include a small excerpt of error log lines (redacted)'
+    required: false
+    default: 'false'
+  max-issues-per-workflow:
+    description: 'Cap on open issues per workflow fingerprint'
+    required: false
+    default: '3'
+  rate-limit-hours:
+    description: 'Per-fingerprint backoff window (hours)'
+    required: false
+    default: '24'
+  always-create-new:
+    description: 'Ignore dedupe and always open a new issue'
+    required: false
+    default: 'false'
+  config-path:
+    description: 'Optional repo config file path (e.g. .github/workflow-issue-creator.yml)'
+    required: false
+    default: '.github/workflow-issue-creator.yml'
+  copilot-optimized:
+    description: 'Write body in AI/agent-friendly structure'
+    required: false
+    default: 'true'
+  consolidated-mode:
+    description: 'Accept/merge step data captured by other steps'
+    required: false
+    default: 'false'
+  snooze-until:
+    description: 'ISO date; skip creation until this date (snooze)'
+    required: false
+
+outputs:
+  issue-number:
+    description: 'Created or updated issue number'
+  issue-url:
+    description: 'Issue html_url'
+  deduped:
+    description: 'true if existing issue was updated rather than created'
+  fingerprint:
+    description: 'Stable fingerprint of this failure'
+  resolved:
+    description: 'true if close-on-success closed an existing fingerprint issue'
+  detected-category:
+    description: 'Auto-detected category'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

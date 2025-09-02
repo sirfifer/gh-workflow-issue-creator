@@ -1,0 +1,9 @@
+jobs:
+  close-issue-on-success:
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: your-org/GH-Workflow-Issue-Creator@v1
+        with:
+          mode: close-on-success
+          github-token: ${{ secrets.GITHUB_TOKEN }}

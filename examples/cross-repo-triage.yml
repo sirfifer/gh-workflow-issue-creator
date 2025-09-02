@@ -1,0 +1,11 @@
+jobs:
+  triage-to-central:
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: your-org/GH-Workflow-Issue-Creator@v1
+        with:
+          auth-mode: pat
+          github-token: ${{ secrets.FINE_GRAINED_PAT }}
+          target-owner: your-org
+          target-repo: central-triage

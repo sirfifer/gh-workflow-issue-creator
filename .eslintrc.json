@@ -1,0 +1,14 @@
+{
+  "root": true,
+  "env": { "es2022": true, "node": true },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": { "project": ["./tsconfig.json"] },
+  "plugins": ["@typescript-eslint", "import"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:import/recommended", "plugin:import/typescript", "prettier"],
+  "rules": {
+    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "import/order": ["error", { "alphabetize": { "order": "asc", "caseInsensitive": true } }]
+  }
+}

@@ -1,0 +1,5 @@
+# Repo defaults (action inputs still win)
+failureLabel: workflow-failure
+autoDetectCategory: true
+rateLimitHours: 24
+maxIssuesPerWorkflow: 3

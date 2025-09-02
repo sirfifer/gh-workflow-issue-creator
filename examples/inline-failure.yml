@@ -1,0 +1,22 @@
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm test
+
+  issue-on-failure:
+    needs: [build]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: your-org/GH-Workflow-Issue-Creator@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          category: general
+          dedupe-strategy: fingerprint
