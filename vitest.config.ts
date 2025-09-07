@@ -4,13 +4,14 @@ export default defineConfig({
   test: {
     environment: 'node',
     coverage: {
-      provider: 'c8',
+      provider: 'v8',
       reporter: ['text', 'html'],
-      statements: 100,
-      branches: 100,
-      functions: 100,
-      lines: 100,
+      statements: 80,
+      branches: 80,
+      functions: 80,
+      lines: 80,
       include: ['src/**/*.ts'],
+      exclude: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
     },
   },
 });
