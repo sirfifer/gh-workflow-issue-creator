@@ -1,0 +1,134 @@
+{
+  "automation": {
+    "maxIterations": 50,
+    "autoFix": true,
+    "verbose": true,
+    "stopOnFirstSuccess": true,
+    "pauseBetweenIterations": 1000,
+    "timeout": 120000
+  },
+  "coverage": {
+    "statements": 100,
+    "branches": 100,
+    "functions": 100,
+    "lines": 100,
+    "skipFiles": [
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      "**/tests/**",
+      "**/scripts/**"
+    ]
+  },
+  "validation": {
+    "requiredFiles": [
+      "package.json",
+      "package-lock.json",
+      "action.yml",
+      "dist/index.js",
+      "README.md",
+      "LICENSE"
+    ],
+    "requiredScripts": [
+      "build",
+      "test",
+      "lint"
+    ],
+    "actionRequirements": {
+      "hasName": true,
+      "hasDescription": true,
+      "hasRuns": true,
+      "mainFile": "dist/index.js",
+      "nodeVersion": "node20"
+    }
+  },
+  "phases": {
+    "setup": {
+      "enabled": true,
+      "timeout": 60000
+    },
+    "compilation": {
+      "enabled": true,
+      "timeout": 30000,
+      "autoFix": true
+    },
+    "lint": {
+      "enabled": true,
+      "timeout": 30000,
+      "autoFix": true
+    },
+    "test": {
+      "enabled": true,
+      "timeout": 60000,
+      "retries": 2
+    },
+    "coverage": {
+      "enabled": true,
+      "timeout": 60000,
+      "failOnMissing": true
+    },
+    "build": {
+      "enabled": true,
+      "timeout": 60000,
+      "verifyOutput": true
+    },
+    "validation": {
+      "enabled": true,
+      "timeout": 30000
+    }
+  },
+  "autoFixes": {
+    "lint": {
+      "enabled": true,
+      "command": "npx eslint . --ext .ts --fix"
+    },
+    "format": {
+      "enabled": true,
+      "command": "npm run format"
+    },
+    "types": {
+      "enabled": true,
+      "installMissingTypes": true
+    }
+  },
+  "reporting": {
+    "logFile": "test-automation.log",
+    "fixRequestFile": ".fix-request.json",
+    "reportFile": "automation-report.json",
+    "quickTestReport": "quick-test-report.json",
+    "setupReport": "setup-report.json",
+    "verbose": true,
+    "showCoverage": true,
+    "showSuggestions": true
+  },
+  "security": {
+    "auditLevel": "high",
+    "checkForSecrets": true,
+    "secretPatterns": [
+      "api[_-]?key\\s*=\\s*[\"'][^\"']+[\"']",
+      "token\\s*=\\s*[\"'][^\"']+[\"']",
+      "password\\s*=\\s*[\"'][^\"']+[\"']",
+      "secret\\s*=\\s*[\"'][^\"']+[\"']"
+    ]
+  },
+  "paths": {
+    "src": "src",
+    "tests": "tests",
+    "dist": "dist",
+    "scripts": "scripts",
+    "templates": "templates",
+    "coverage": "coverage"
+  },
+  "testPatterns": {
+    "unit": "**/*.test.ts",
+    "integration": "**/integration/**/*.test.ts",
+    "e2e": "**/e2e/**/*.test.ts"
+  },
+  "successCriteria": {
+    "allTestsPass": true,
+    "coverageMet": true,
+    "buildSuccessful": true,
+    "noSecurityIssues": true,
+    "noLintErrors": true,
+    "actionValid": true
+  }
+}

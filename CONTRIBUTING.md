@@ -2,9 +2,19 @@
 
 Welcome! We're thrilled you're interested in contributing. This project aims for a crisp DX and a strong test culture, and we believe the best software is built by diverse teams with varied perspectives.
 
+## ⚠️ CRITICAL: Project Not Yet Functional
+
+**Before you contribute, know this:** The project source code exists but has never been built or had dependencies installed. Your first contribution might be helping us get it working!
+
+### Current Blockers
+- ❌ No `package-lock.json` - dependencies never installed
+- ❌ No `dist/` directory - project never built  
+- ❌ Tests don't run - missing dependencies
+- ❌ Cannot be used as GitHub Action yet
+
 ## 📢 Current Contribution Status
 
-**We're accepting all contributions!** This project is in active development and benefits greatly from community input. Whether you're fixing a typo, adding a feature, or redesigning architecture, we want to hear from you.
+**We're accepting all contributions!** But we especially need help with basic setup. The most valuable contribution right now would be getting this project to build and run.
 
 ### Why We Build in Public
 
@@ -76,7 +86,9 @@ Help us make this rock-solid:
 - npm 9+
 - Git
 
-### Local Development
+### ⚡ IMPORTANT: Initial Setup Required
+
+**The project has never been set up!** You cannot use `npm ci` because no `package-lock.json` exists yet.
 
 ```bash
 # Fork and clone your fork
@@ -86,30 +98,45 @@ cd gh-workflow-issue-creator
 # Add upstream remote
 git remote add upstream https://github.com/your-org/gh-workflow-issue-creator.git
 
-# Install dependencies
-npm ci
+# CRITICAL FIRST STEP - Install dependencies for the first time
+npm install  # Creates package-lock.json (DO NOT use npm ci - it will fail!)
 
-# Create a feature branch
+# Now try to run tests (may fail - document any errors!)
+npm test
+
+# Try to build (may fail - document any errors!)
+npm run build
+
+# If everything works, commit the package-lock.json and dist/
+git add package-lock.json dist/
+git commit -m "feat: initial project setup - add lock file and build"
+
+# Create a feature branch for other work
 git checkout -b feature/your-feature-name
 
-# Start development
-npm run dev          # Watch mode for TypeScript
-npm test -- --watch  # Watch mode for tests
+# IF the project is already set up (package-lock.json exists), then:
+# npm ci              # Install from lock file
+# npm run dev         # Watch mode for TypeScript  
+# npm test -- --watch # Watch mode for tests
 ```
 
 ### Before Submitting
 
 ```bash
+# IF THE PROJECT IS WORKING:
 # Run all checks
 npm run check  # Runs lint + test
 
 # Individual checks
 npm run lint   # ESLint
-npm test       # Vitest with coverage (must stay 100%)
+npm test       # Vitest with coverage (should be 100% once working)
 npm run build  # Bundle with ncc
 
 # Format code
 npm run format
+
+# IF THE PROJECT ISN'T WORKING YET:
+# Document what's broken and submit that as your contribution!
 ```
 
 ## 📋 Coding Standards
