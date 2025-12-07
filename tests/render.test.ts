@@ -1,23 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderBody } from '../src/lib/render';
-import Mustache from 'mustache';
 
-// Mock Mustache
-vi.mock('mustache');
-
+// Use real Mustache for proper template rendering
 describe('render.ts - Template Rendering', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    
-    // Default Mustache mock behavior
-    (Mustache.render as any) = vi.fn((template: string, data: any) => {
-      // Simple mock implementation
-      let result = template;
-      Object.keys(data).forEach(key => {
-        result = result.replace(new RegExp(`{{${key}}}`, 'g'), data[key]);
-      });
-      return result;
-    });
   });
   
   describe('Basic Rendering', () => {
@@ -37,7 +24,7 @@ describe('render.ts - Template Rendering', () => {
         fingerprint: 'fp-123',
       });
       
-      expect(Mustache.render).toHaveBeenCalled();
+      // Template should render with context values
       expect(result).toContain('CI Build');
       expect(result).toContain('owner/repo');
     });
@@ -159,18 +146,19 @@ describe('render.ts - Template Rendering', () => {
     });
     
     it('should render URLs', async () => {
+      // Use triple braces to prevent HTML escaping of URLs
       const template = `
-        Workflow URL: {{workflowUrl}}
-        Commit URL: {{commitUrl}}
-        Server: {{serverUrl}}
+        Workflow URL: {{{workflowUrl}}}
+        Commit URL: {{{commitUrl}}}
+        Server: {{{serverUrl}}}
       `;
-      
+
       const ctx = {
         workflowUrl: 'https://github.com/owner/repo/actions/runs/123',
         commitUrl: 'https://github.com/owner/repo/commit/abc123',
         serverUrl: 'https://github.com',
       };
-      
+
       const result = await renderBody({
         template,
         inputs: {},
@@ -178,7 +166,7 @@ describe('render.ts - Template Rendering', () => {
         category: 'general',
         fingerprint: 'fp-123',
       });
-      
+
       expect(result).toContain('https://github.com/owner/repo/actions/runs/123');
       expect(result).toContain('https://github.com/owner/repo/commit/abc123');
       expect(result).toContain('https://github.com');
@@ -392,20 +380,17 @@ describe('render.ts - Template Rendering', () => {
       expect(result).toBeDefined();
     });
     
-    it('should handle malformed templates', async () => {
-      (Mustache.render as any) = vi.fn(() => {
-        throw new Error('Template syntax error');
-      });
-      
+    it('should throw on malformed templates', async () => {
+      // Mustache throws on unclosed tags
       const template = '{{unclosed';
-      
+
       await expect(renderBody({
         template,
         inputs: {},
         ctx: {},
         category: 'general',
         fingerprint: 'fp-123',
-      })).rejects.toThrow('Template syntax error');
+      })).rejects.toThrow('Unclosed tag');
     });
     
     it('should handle null/undefined context gracefully', async () => {
