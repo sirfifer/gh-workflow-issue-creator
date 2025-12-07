@@ -1,83 +1,28 @@
 # GH-Workflow-Issue-Creator
 
-[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
-[![GitHub issues](https://img.shields.io/github/issues/your-org/gh-workflow-issue-creator)](https://github.com/your-org/gh-workflow-issue-creator/issues)
-[![GitHub discussions](https://img.shields.io/github/discussions/your-org/gh-workflow-issue-creator)](https://github.com/your-org/gh-workflow-issue-creator/discussions)
+[![CI](https://github.com/your-org/gh-workflow-issue-creator/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/gh-workflow-issue-creator/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> 🚧 **Pre-Alpha Software**: This project is NOT YET FUNCTIONAL. The source code is written but the project hasn't been built or packaged. We're building in public - star the repo to follow our progress toward a working release!
+Create or update a GitHub issue whenever a workflow fails. Smart deduplication (stable fingerprint), category-aware templates, and AI-friendly formatting help humans and agents fix failures fast. Built with TypeScript, Vitest, and ncc.
 
-Create or update a GitHub issue whenever a workflow fails. Smart deduplication (stable fingerprint), category-aware templates, and AI-friendly formatting help humans and agents fix failures fast. Built with a 100% build-to-test philosophy and mature tooling (TypeScript, Vitest, ncc).
+## ✨ Features
 
-## ⚠️ Critical Setup Required
-
-**This action does not work yet!** The code is written but critical setup steps haven't been completed:
-
-### What's Missing
-- ❌ **No package-lock.json** - Dependencies have never been installed
-- ❌ **No dist/ directory** - Action hasn't been built for distribution
-- ❌ **Not runnable** - Cannot be used as a GitHub Action in current state
-- ❌ **Tests don't run** - Dependencies missing, coverage unknown
-
-### To Make This Work
-If you want to help get this project functional:
-```bash
-# 1. Install dependencies (creates package-lock.json)
-npm install
-
-# 2. Run tests to verify code
-npm test
-
-# 3. Build the distribution
-npm run build
-
-# 4. Commit the package-lock.json and dist/ directory
-```
-
-See [SETUP.md](SETUP.md) for detailed setup instructions.
-
-## 📍 Current Project Status
-
-### Actual State (Reality Check)
-- 📝 **Source Code**: Complete - all features coded
-- 🚫 **Build Status**: NOT BUILT - missing dist/ directory
-- 🚫 **Dependencies**: NOT INSTALLED - no package-lock.json
-- 🚫 **Tests**: CANNOT RUN - dependencies missing
-- 🚫 **Usability**: ZERO - cannot be used as GitHub Action
-- 📚 **Documentation**: Written optimistically for future state
-
-### What's Actually Implemented (in code)
-- ✅ Issue creation/update logic
-- ✅ Fingerprint-based deduplication
-- ✅ Category detection and templates
-- ✅ Close-on-success mode
-- ✅ Cross-repository support
-- ✅ Configuration system
-- ✅ Template rendering with Mustache
-
-### What's Needed Before First Use
-1. Install dependencies (`npm install`)
-2. Verify tests pass (`npm test`)
-3. Build distribution (`npm run build`)
-4. Test in actual GitHub Action workflow
-5. Fix any runtime issues discovered
-
-## 🎯 Planned Features (When Built)
-
-Once this project is properly built and tested, it will provide:
-
-- 🔍 **Smart Deduplication**: Stable fingerprints prevent duplicate issues
-- 📝 **Category Templates**: Pre-built templates for common failure types
-- 🤖 **AI-Friendly**: Structured output that agents can parse and act on
-- 🔒 **Secure**: Works with `GITHUB_TOKEN` or fine-grained PAT
-- 📦 **Minimal Dependencies**: Fast runtime with bundled distribution
+- 🔍 **Smart Deduplication**: Stable fingerprints prevent duplicate issues for recurring failures
+- 📝 **Category Templates**: Pre-built templates for common failure types (tests, security, terraform, deployment)
+- 🤖 **AI-Friendly**: Structured output that agents like GitHub Copilot can parse and act on
+- 🔒 **Secure**: Automatic redaction of secrets, tokens, and sensitive data
 - ✅ **Auto-Close**: Companion mode closes issues when builds turn green
+- 📦 **Cross-Repository**: Create issues in a different repository for centralized tracking
 
-## 🚀 How It Will Work (Future)
+## 🚀 Quick Start
 
-Once built and functional, usage will look like:
+### Basic Usage
 
 ```yaml
+name: CI
+
+on: [push, pull_request]
+
 permissions:
   contents: read
   actions: read
@@ -98,121 +43,190 @@ jobs:
       - uses: your-org/GH-Workflow-Issue-Creator@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          category: general
-          dedupe-strategy: fingerprint
 ```
 
-## 🤝 Contributing
+### Close Issues on Success
 
-We need help getting this project from code to working action! Whether you're helping with the build process, testing, or documentation, your contribution matters.
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm test
 
-### Immediate Help Needed
-1. **Build the project** - Get dist/ directory created
-2. **Test the build** - Verify it works in a workflow
-3. **Document issues** - Report what breaks
-4. **Fix problems** - Help resolve build/runtime issues
+  close-on-success:
+    needs: [build]
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: your-org/GH-Workflow-Issue-Creator@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          mode: close-on-success
+```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+## 📋 Inputs
+
+| Input | Required | Default | Description |
+|-------|----------|---------|-------------|
+| `github-token` | ✅ | - | GitHub token for API access |
+| `mode` | | `create` | `create` or `close-on-success` |
+| `category` | | `general` | Issue category (auto-detected if enabled) |
+| `auto-detect-category` | | `true` | Auto-detect category from workflow name |
+| `dedupe-strategy` | | `fingerprint` | `fingerprint` or `none` |
+| `failure-label` | | `workflow-failure` | Primary label for issues |
+| `additional-labels` | | | Comma-separated extra labels |
+| `assignees` | | | Comma-separated usernames |
+| `target-owner` | | | Cross-repo: target owner |
+| `target-repo` | | | Cross-repo: target repository |
+| `body-template` | | | Inline Mustache template |
+| `body-template-path` | | | Path to template file |
+| `include-logs` | | `false` | Include error log excerpts |
+| `max-issues-per-workflow` | | `3` | Cap on open issues |
+| `snooze-until` | | | ISO date to delay creation |
+| `copilot-optimized` | | `true` | AI-friendly output structure |
+
+## 📤 Outputs
+
+| Output | Description |
+|--------|-------------|
+| `issue-number` | Created/updated issue number |
+| `issue-url` | Issue HTML URL |
+| `fingerprint` | Stable fingerprint of this failure |
+| `deduped` | `true` if an existing issue was updated |
+| `resolved` | `true` if close-on-success closed an issue |
+| `detected-category` | Auto-detected category |
+
+## 🏷️ Categories
+
+The action automatically detects the category based on workflow and job names:
+
+| Category | Detected When |
+|----------|--------------|
+| `terraform-validation` | Workflow contains "terraform" |
+| `security-scan` | Contains "security", "codeql", "snyk" |
+| `infrastructure-deployment` | Contains "deploy", "release" |
+| `code-quality` | Contains "test", "lint", "build" |
+| `general` | Default fallback |
+
+Each category uses a specialized template with relevant troubleshooting steps.
+
+## 🔒 Security
+
+### Automatic Redaction
+
+The action automatically redacts sensitive data from issue bodies:
+
+- API keys and tokens (GitHub, npm, AWS, etc.)
+- Passwords and secrets
+- Private keys (SSH, PEM)
+- Database connection strings
+- Credit card numbers
+- JWTs
+
+### Required Permissions
+
+```yaml
+permissions:
+  contents: read    # For checkout
+  actions: read     # For workflow context
+  issues: write     # For creating/updating issues
+```
 
 ## 🛠️ Development
 
-### Current Blockers
-```bash
-# THIS DOESN'T WORK YET:
-npm ci  # Fails - no package-lock.json exists
+### Prerequisites
 
-# NEED TO DO THIS FIRST:
-npm install  # Creates package-lock.json
-npm test     # Verify tests work
-npm run build # Create dist/ directory
+- Node.js 18+
+- npm 9+
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/your-org/gh-workflow-issue-creator.git
+cd gh-workflow-issue-creator
+
+# Install dependencies
+npm install
+
+# Run tests
+npm test
+
+# Build the action
+npm run build
 ```
 
 ### Project Structure
+
 ```
 gh-workflow-issue-creator/
-├── src/              # ✅ Source code (complete)
-│   ├── index.ts      # ✅ Main entry point
-│   └── lib/          # ✅ Core functionality
-├── tests/            # ⚠️ Test files (minimal)
-├── templates/        # ✅ Issue templates
-├── examples/         # ✅ Usage examples
-├── dist/             # ❌ MISSING - needs build
-├── package.json      # ✅ Exists
-└── package-lock.json # ❌ MISSING - needs npm install
+├── src/
+│   ├── index.ts              # Main entry point
+│   └── lib/
+│       ├── config.ts         # Input validation (Zod)
+│       ├── context.ts        # GitHub context builder
+│       ├── category.ts       # Category auto-detection
+│       ├── fingerprint.ts    # Stable fingerprint computation
+│       ├── render.ts         # Mustache template rendering
+│       ├── issue-manager.ts  # Issue CRUD operations
+│       └── redact.ts         # Sensitive data redaction
+├── tests/                    # Test files
+├── templates/                # Issue templates
+├── dist/                     # Built action (generated)
+└── action.yml                # Action definition
 ```
 
-## 📊 Project Transparency
+### Scripts
 
-Honest assessment of where we are:
+| Script | Description |
+|--------|-------------|
+| `npm test` | Run tests with coverage |
+| `npm run build` | Bundle for distribution |
+| `npm run lint` | Run ESLint |
+| `npm run format` | Format with Prettier |
+| `npm run check` | Lint + test |
+| `npm run test:e2e` | Run E2E tests |
 
-| Metric | Status |
-|--------|--------|
-| **Development Stage** | Pre-Alpha (unbuildable) |
-| **Source Code** | 100% written |
-| **Build Artifacts** | 0% (missing dist/) |
-| **Dependencies** | Not installed |
-| **Test Coverage** | Unknown (can't run) |
-| **Production Ready** | Absolutely not |
-| **Can Be Used** | No |
-| **Time to Functional** | ~1-2 hours of setup work |
+## 📚 Examples
 
-### Why This State?
+See the [examples/](examples/) directory for more usage patterns:
 
-This appears to be an initial code commit without the build/setup phase completed. The source code is present but the project hasn't gone through the steps needed to make it actually usable as a GitHub Action.
+- [Workflow Run Trigger](examples/workflow-run.yml)
+- [Close on Success](examples/close-on-success.yml)
+- [Inline Failure Handling](examples/inline-failure.yml)
+- [Cross-Repository Triage](examples/cross-repo-triage.yml)
 
-## 🗺️ Realistic Roadmap
+## 🤝 Contributing
 
-See [ROADMAP.md](ROADMAP.md) for detailed plans.
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-### Immediate Priority: Make It Work
-1. Install dependencies
-2. Run and fix tests
-3. Build distribution
-4. Test in real workflow
-5. Fix discovered issues
-6. Create first working release
+### Quick Contribution Steps
 
-### Then: Claimed Features
-After we have a working build, we can verify and improve the features already coded.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes with tests
+4. Run `npm run check`
+5. Submit a pull request
 
-## 🙏 Acknowledgments
-
-### The Code That Exists
-Thanks to whoever wrote the initial source code. Now we need to make it run!
-
-### Future Contributors
-If you help get this working, you'll be helping teams worldwide handle CI/CD failures better.
-
-## 📢 Stay Updated
-
-- ⭐ **Star this repo** to follow progress toward functionality
-- 👁️ **Watch for updates** on when this becomes usable
-- 💬 **Join discussions** about getting this working
-- 🔨 **Help build** what's missing
-
-## ⚡ Quick Status Check
-
-```bash
-# Run this to see what's missing:
-ls dist/ 2>/dev/null && echo "✅ Built" || echo "❌ Not built"
-ls package-lock.json 2>/dev/null && echo "✅ Dependencies locked" || echo "❌ No lock file"
-npm test 2>/dev/null && echo "✅ Tests pass" || echo "❌ Tests don't run"
-```
-
-Current result: All ❌
-
-## 📝 License
+## 📄 License
 
 MIT - See [LICENSE](LICENSE) for details.
+
+## 🔗 Links
+
+- [Configuration Reference](docs/CONFIGURATION_REFERENCE.md)
+- [Security Policy](SECURITY.md)
+- [Roadmap](ROADMAP.md)
+- [Decisions Log](DECISIONS.md)
 
 ---
 
 <div align="center">
 
-**Building in Public • Currently Broken • Help Us Fix It**
+**Automatically track workflow failures • Smart deduplication • AI-ready**
 
-*This README accurately reflects the current non-functional state. When the project works, we'll update this!*
-
-[Report Issue](https://github.com/your-org/gh-workflow-issue-creator/issues) • [Start Discussion](https://github.com/your-org/gh-workflow-issue-creator/discussions) • [View Setup Guide](SETUP.md)
+[Report Bug](https://github.com/your-org/gh-workflow-issue-creator/issues) • [Request Feature](https://github.com/your-org/gh-workflow-issue-creator/discussions) • [Documentation](docs/)
 
 </div>

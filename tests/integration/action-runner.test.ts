@@ -45,8 +45,8 @@ describe('Action Runner Integration Tests', () => {
   afterEach(() => {
     // Restore original state
     process.env = originalEnv;
-    process.chdir(originalCwd);
-    
+    // Note: process.chdir() is not supported in worker threads
+
     // Clean up temp directory
     if (fs.existsSync(tempDir)) {
       fs.rmSync(tempDir, { recursive: true, force: true });

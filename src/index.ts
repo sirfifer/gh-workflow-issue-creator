@@ -28,7 +28,7 @@ async function run(): Promise<void> {
     core.setOutput('detected-category', category);
 
     if (inputs.mode === 'close-on-success') {
-      const manager = new IssueManager(octokit, inputs, ghCtx);
+      const manager = new IssueManager(octokit as any, inputs, ghCtx);
       const fp = computeFingerprint({ ctx: ghCtx, category, errorSignatures: [] });
       const closed = await manager.closeIfOpenByFingerprint(fp);
       core.setOutput('fingerprint', fp);
@@ -49,7 +49,7 @@ async function run(): Promise<void> {
     const fingerprint = computeFingerprint({ ctx: ghCtx, category, errorSignatures: ghCtx.errorSignatures || [] });
     core.setOutput('fingerprint', fingerprint);
 
-    const manager = new IssueManager(octokit, inputs, ghCtx);
+    const manager = new IssueManager(octokit as any, inputs, ghCtx);
     const existing = await manager.findExistingByFingerprint(fingerprint);
 
     const template = await manager.loadTemplate(category);

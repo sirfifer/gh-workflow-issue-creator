@@ -63,6 +63,9 @@ describe('IssueManager', () => {
       category: 'general'
     });
     expect(res.number).toBe(1);
-    expect(res.body).toBe('Updated');
+    // Body should contain original content plus update notice
+    expect(res.body).toContain('Updated');
+    expect(res.body).toContain('Update');
+    expect(res.body).toContain('fp-xyz');
   });
 });
